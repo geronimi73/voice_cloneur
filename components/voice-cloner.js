@@ -116,7 +116,7 @@ export default function VoiceCloner() {
             ) : (
               <>
                 <PlayCircle className="mr-2 h-4 w-4" />
-                Clone Voice & Generate Audio
+                Clone Voice 
               </>
             )}
           </Button>
