@@ -32,8 +32,9 @@ export default function VoiceCloner() {
       if (!["www.youtube.com", "youtube.com", "youtu.be"].includes(url.hostname)) {
         throw new Error("Invalid hostname")
       }
-    } catch (_) {
+    } catch (e) {
       setError("Please enter a valid YouTube URL.")
+      console.error(e.toString())
       return
     }
 
