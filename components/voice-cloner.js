@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,9 +14,11 @@ export default function VoiceCloner() {
   const [youtubeUrl, setYoutubeUrl] = useState("https://www.youtube.com/shorts/jcNzoONhrmE")
   const [audioSrc, setAudioSrc] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [status, setStatus] = useState("")
   const [error, setError] = useState(null)
+  const [jobID, setJobID] = useState(false);
 
-  const handleSubmit = async (e) => {
+  async function handleSubmit (e) {
     e.preventDefault()
     setError(null)
     setAudioSrc(null)
@@ -39,9 +41,10 @@ export default function VoiceCloner() {
     }
 
     setIsLoading(true)
+    setStatus("Submitting")
 
     try {
-      const response = await fetch("/api/clone-voice", {
+      const response = await fetch("/api/run", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,18 +58,57 @@ export default function VoiceCloner() {
       }
 
       const data = await response.json()
-      if (data.audio_base64) {
-        setAudioSrc(`data:audio/wav;base64,${data.audio_base64}`)
-      } else {
-        throw new Error("No audio data received from API.")
-      }
+
+      setStatus("Job submitted")
+      setJobID(data.rp_id)
     } catch (err) {
       setError(err.message || "An unexpected error occurred.")
       console.error("Cloning error:", err)
-    } finally {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    let interval = null;
+
+    if (jobID) {
+      interval = setInterval(() => {
+        fetch("/api/status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ rp_id: jobID }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Client Poll: ")
+          console.log(data)
+
+          if (data.rp_status == "COMPLETED"){
+            setAudioSrc(`data:audio/wav;base64,${data.output.audio_base64}`)
+            setJobID(null)
+            setIsLoading(false)
+          } else if (data.rp_status == "IN_QUEUE") {
+            setStatus("Job queued")
+          } else if (data.rp_status == "IN_PROGRESS") {
+            setStatus("Job in progress")
+          } else {
+            // something went wrong
+            setError("Job failed: " + data.rp_status)
+            setIsLoading(false)
+            setJobID(null)
+          }
+        })
+      }, 1000); 
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [jobID]); // Dependency array includes isPolling to restart polling when it changes
 
   return (
     <Card className="w-full max-w-lg bg-slate-800 border-slate-700 text-white">
@@ -112,7 +154,7 @@ export default function VoiceCloner() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
+                {status}...
               </>
             ) : (
               <>
