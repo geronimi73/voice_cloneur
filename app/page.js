@@ -11,7 +11,7 @@ export default function HomePage() {
       </header>
       <VoiceCloner />
       <footer className="mt-12 text-center text-sm text-slate-500">
-        <p>Ensure your voice cloning API is running and accessible.</p>
+        <p>Ensure your RunPod worker is running and accessible.</p>
       </footer>
     </div>
   )
