@@ -2,7 +2,7 @@ Simple voice cloning with Next.JS, [chatterbox](https://huggingface.co/ResembleA
 
 # Setup
 
-* Deploy Serverless my [Chatterbox Serverless Endpoint](https://github.com/geronimi73/runpod_chatterbox) on RunPod
+* Deploy my [Chatterbox Serverless Endpoint](https://github.com/geronimi73/runpod_chatterbox) on RunPod
 * Clone this repo
 
 ```bash
