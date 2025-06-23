@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Loader2, AlertTriangle, PlayCircle } from "lucide-react"
 
 export default function VoiceCloner() {
-  const [prompt, setPrompt] = useState("")
+  const [prompt, setPrompt] = useState("Life is what happens when you're busy making other plans")
   const [youtubeUrl, setYoutubeUrl] = useState("https://www.youtube.com/shorts/jcNzoONhrmE")
   const [audioSrc, setAudioSrc] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
